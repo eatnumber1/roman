@@ -5,6 +5,8 @@ extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_drive3 as drive3;
 extern crate serde_json;
+extern crate md5;
+extern crate hex;
 
 use std::io;
 use std::fs;
@@ -14,25 +16,30 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fmt;
 use std::result;
+use hex::FromHex;
 
 #[derive(Eq, PartialEq, Hash, Clone)]
 struct Rom {
   game_name: String,
   file_name: String,
   size: i64,
-  md5: String,
+  md5: md5::Digest,
 }
 
 impl fmt::Debug for Rom {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "Rom {{ game_name: \"{}\", file_name: \"{}\", size: {}, md5: \"{}\" }}",
+    write!(f, "Rom {{ game_name: \"{}\", file_name: \"{}\", size: {}, md5: \"{:x}\" }}",
            self.game_name, self.file_name, self.size, self.md5)
   }
 }
 
+fn md5_digest(s: &str) -> result::Result<md5::Digest, <[u8; 16] as hex::FromHex>::Error> {
+  return Ok(md5::Digest(<[u8; 16]>::from_hex(s)?));
+}
+
 // TODO(https://github.com/rahulg/treexml-rs/issues/15): Change this to return a Result when it's
 // possible to convert a treexml::Error into a Box<std::error::Error>
-fn get_roms() -> HashMap<String, Vec<Rom>> {
+fn get_roms() -> HashMap<md5::Digest, Vec<Rom>> {
     let filename = "testdata/NEC - PC Engine CD & TurboGrafx CD - Datfile (421) (2018-08-31 07-40-50).dat";
 
     let file = fs::OpenOptions::new().read(true).open(filename)
@@ -50,14 +57,14 @@ fn get_roms() -> HashMap<String, Vec<Rom>> {
     }
 
     let games = datafile.filter_children(|tag| tag.name == "game");
-    let mut romsv: HashMap<String, Vec<Rom>> = HashMap::new();
+    let mut romsv: HashMap<md5::Digest, Vec<Rom>> = HashMap::new();
     for game in games {
       let game_name = &game.attributes["name"];
       let roms = game.filter_children(|tag| tag.name == "rom");
       for rom in roms {
         let file_name = &rom.attributes["name"];
         let size = &rom.attributes["size"];
-        let md5 = rom.attributes["md5"].to_string();
+        let md5 = md5_digest(&rom.attributes["md5"]).unwrap();
         let r = Rom {
           game_name: game_name.to_string(),
           file_name: file_name.to_string(),
@@ -72,7 +79,7 @@ fn get_roms() -> HashMap<String, Vec<Rom>> {
 }
 
 struct DriveRomManager {
-  roms: HashMap<String, Vec<Rom>>,
+  roms: HashMap<md5::Digest, Vec<Rom>>,
   rootid: String,
   dest_folder: String,
   hub: drive3::Drive<
@@ -86,7 +93,7 @@ struct DriveRomManager {
 type Result = result::Result<(), Box<error::Error>>;
 
 impl DriveRomManager {
-  pub fn new(roms: HashMap<String, Vec<Rom>>) -> result::Result<DriveRomManager, Box<error::Error>> {
+  pub fn new(roms: HashMap<md5::Digest, Vec<Rom>>) -> result::Result<DriveRomManager, Box<error::Error>> {
     let secret = oauth2::read_application_secret(Path::new("client_id.json"))?;
     use hyper::net::HttpsConnector;
     use hyper_rustls::TlsClient;
@@ -168,7 +175,7 @@ impl DriveRomManager {
           .param("fields", "size,md5Checksum")
           .doit()?;
         let size = got.size.ok_or("file size not found")?.parse()?;
-        let md5 = got.md5_checksum.ok_or("file md5 not found")?;
+        let md5 = md5_digest(&got.md5_checksum.ok_or("file md5 not found")?)?;
         let r = Rom {
           game_name: game_name.unwrap().clone(),
           file_name: name,
@@ -227,9 +234,9 @@ impl DriveRomManager {
           .param("fields", "size,md5Checksum")
           .doit()?;
         let size: i64 = got.size.ok_or("file size not found")?.parse()?;
-        let md5 = got.md5_checksum.ok_or("file md5 not found")?;
+        let md5 = md5_digest(&got.md5_checksum.ok_or("file md5 not found")?)?;
         if !self.roms.contains_key(&md5) {
-          println!("!! File not found: {} with hash {}\n", name, md5);
+          println!("!! File not found: {} with hash {:x}\n", name, md5);
           continue;
         }
 
@@ -283,3 +290,5 @@ fn main() {
   let drm = DriveRomManager::new(roms).unwrap();
   drm.organize().unwrap();
 }
+
+// vim:tabstop=2 shiftwidth=2 softtabstop=2 expandtab textwidth=80

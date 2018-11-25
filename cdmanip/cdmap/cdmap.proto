@@ -1,0 +1,72 @@
+// CompactDiscMap format based loosely off of
+// https://web.archive.org/web/20160201021136/http://digitalx.org/cue-sheet/syntax/#file
+syntax = "proto3";
+
+package cdmanip.cdmap;
+
+message File {
+  string name = 1;
+  string basedir = 6;
+
+  enum Type {
+    TYPE_UNKNOWN = 0;  // Unknown type. should never happen
+    // Intel binary file (least significant byte first)
+    TYPE_BINARY_BIG_ENDIAN = 1;
+    // Motorola binary file (most significant byte first)
+    TYPE_BINARY_LITTLE_ENDIAN = 2;
+    TYPE_AIFF = 3;  // Audio AIFF file
+    TYPE_WAVE = 4;  // Audio WAVE file
+    TYPE_MP3 = 5;  // Audio MP3 file
+  }
+  Type type = 2;
+
+  uint64 size = 3;
+  int64 blksize = 4;
+
+  string md5sum = 5;
+}
+
+message Track {
+  int32 num = 1;
+  File file = 2;
+  int64 sector_size = 3;
+
+  enum Type {
+    TYPE_UNKNOWN = 0;  // Unknown track type. Should never happen.
+    TYPE_AUDIO = 1;  // Audio/Music (2352)
+    TYPE_CDG = 2;  // Karaoke CD+G (2448)
+    TYPE_MODE1_2048 = 3;  // CDROM Mode1 Data (cooked)
+    TYPE_MODE1_2352 = 4;  // CDROM Mode1 Data (raw)
+    TYPE_MODE2_2336 = 5;  // CDROM-XA Mode2 Data
+    TYPE_MODE2_2352 = 6;  // CDROM-XA Mode2 Data
+    TYPE_CDI_2336 = 7;  // CDI Mode2 Data
+    TYPE_CDI_2352 = 8;  // CDI Mode2 Data
+  }
+  Type datatype = 4;
+
+  // Durations are relative to the beginning of ther containing file.
+  message Duration {
+    int32 minutes = 1;
+    int32 seconds = 2;
+    // Cue sheet documentation refers to these as "frames", even though that is
+    // incorrect. These are really "sectors". It is not to be confused with the
+    // actual frames that a sector is written into on a CD-ROM.
+    uint32 sectors = 3;
+  }
+  Duration pregap = 5;
+
+  message Index {
+    int32 num = 1;
+    Duration start_position = 2;
+    // The byte offset of the start of the data from the start of the file.
+    int64 offset = 3;
+    // The total length of the data.
+    uint64 length = 4;
+  }
+  repeated Index index = 6;
+}
+
+message CompactDiscMap {
+  string catalog = 1;
+  repeated Track track = 2;
+}

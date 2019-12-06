@@ -162,7 +162,10 @@ Also see rclone --help for additional options.
 
 Example usage:
 $ rclone rcd --rc-user=user --rc-pass=pass &
-$ roman verify --rclone_url='http://user:pass@localhost:5572' --recursive pce.datpb 'gdrive:/Games/PC Engine')";
+$ roman verify \
+    --rclone_url='http://user:pass@localhost:5572' \
+    --recursive \
+    pce.datpb 'gdrive:/Games/PC Engine')";
 
 Status SubCommandVerify(absl::Span<std::string_view> args) {
   if (args.size() != 3) {

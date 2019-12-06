@@ -184,9 +184,23 @@ class RedumpFetcher {
   CurlURL url_;
 };
 
+constexpr char kUsageMessage[] = R"(Usage: roman fetch [options] console
+
+Fetch a datpb from redump.org. Writes the binary datpb to stdout.
+
+The console argument must be a valid console as listed at
+http://redump.org/downloads/. It is the system part of the datfile URL, so if
+the URL to download "Commodore Amiga CD" is http://redump.org/datfile/acd/, the
+correct argument is "acd".
+
+Also see rclone --help for additional options.
+
+Example usage:
+$ roman fetch ps2 > ps2.datpb)";
+
 Status SubCommandFetch(absl::Span<std::string_view> args) {
   if (args.size() != 2) {
-    return InvalidArgumentError("Usage: roman fetch console");
+    return InvalidArgumentError(kUsageMessage);
   }
   std::string_view console(args[1]);
 

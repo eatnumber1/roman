@@ -141,9 +141,32 @@ class GameIndexer {
   }
 };
 
+constexpr char kUsageMessage[] = R"(Usage: roman verify [options] datpb fs:path
+
+Verify the files in a directory against a datpb.
+
+Verify requires a running RClone instance with its remote control interface
+enabled. See https://rclone.org/.
+
+Arguments:
+  datpb - A datpb file describing valid ROMs.
+  fs:path - A RClone-style path specifier. The fs portion specifies the RClone
+    filesystem to access, path specifies the path on the remote.
+
+The --rclone_url flag is required, and describes how to connect to RClone. It
+must specify both the URL to RClone, along with the username and password needed
+to perform authenticated operations. For example,
+--rclone_url='http://user:pass@localhost:5572'
+
+Also see rclone --help for additional options.
+
+Example usage:
+$ rclone rcd --rc-user=user --rc-pass=pass &
+$ roman verify --rclone_url='http://user:pass@localhost:5572' --recursive pce.datpb 'gdrive:/Games/PC Engine')";
+
 Status SubCommandVerify(absl::Span<std::string_view> args) {
   if (args.size() != 3) {
-    return InvalidArgumentError("Usage: roman verify datpb fs:path");
+    return InvalidArgumentError(kUsageMessage);
   }
   std::string_view datpb(args[1]);
   std::string_view fspath(args[2]);

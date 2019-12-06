@@ -1,3 +1,3 @@
-# Roman - short for ROM Manager
+# cdmanip: A ROM verification toolkit
 
-This is ROM manager, tailored for ROMs stored on Google Drive.
+Still in development.

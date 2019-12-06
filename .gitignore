@@ -1,3 +1,7 @@
-client_id.json
-token_store.json
-target/
+bazel-bin
+bazel-roman
+bazel-genfiles
+bazel-out
+bazel-testlogs
+testdata/
+*.datpb

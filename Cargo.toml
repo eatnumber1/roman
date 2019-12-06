@@ -8,6 +8,7 @@ treexml = "^0.7"
 google-drive3 = "*"
 md5 = "^0.5"
 hex = "^0.3.2"
+failure = "^0.1.3"
 # This project intentionally uses an old version of Hyper. See
 # https://github.com/Byron/google-apis-rs/issues/173 for more
 # information.

@@ -1,5 +1,4 @@
 extern crate treexml;
-
 extern crate hyper;
 extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
@@ -16,7 +15,6 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fmt;
 use std::result;
-use hex::FromHex;
 
 #[derive(Eq, PartialEq, Hash, Clone)]
 struct Rom {
@@ -28,13 +26,16 @@ struct Rom {
 
 impl fmt::Debug for Rom {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "Rom {{ game_name: \"{}\", file_name: \"{}\", size: {}, md5: \"{:x}\" }}",
-           self.game_name, self.file_name, self.size, self.md5)
+    write!(
+      f, concat!("Rom {{ game_name: \"{}\", file_name: \"{}\", size: {}, ",
+                 "md5: \"{:x}\" }}"),
+      self.game_name, self.file_name, self.size, self.md5)
   }
 }
 
-fn md5_digest(s: &str) -> result::Result<md5::Digest, <[u8; 16] as hex::FromHex>::Error> {
-  return Ok(md5::Digest(<[u8; 16]>::from_hex(s)?));
+fn md5_digest(s: &str)
+      -> result::Result<md5::Digest, <[u8; 16] as hex::FromHex>::Error> {
+  Ok(md5::Digest(<[u8; 16] as hex::FromHex>::from_hex(s)?))
 }
 
 // TODO(https://github.com/rahulg/treexml-rs/issues/15): Change this to return a Result when it's
@@ -75,7 +76,7 @@ fn get_roms() -> HashMap<md5::Digest, Vec<Rom>> {
       }
     }
     println!("Read {} roms", romsv.len());
-    return romsv;
+    romsv
 }
 
 struct DriveRomManager {
@@ -106,12 +107,12 @@ impl DriveRomManager {
         hyper::Client::with_connector(HttpsConnector::new(TlsClient::new())),
         auth);
 
-    return Ok(DriveRomManager {
+    Ok(DriveRomManager {
       roms: roms,
       hub: hub,
       rootid: "1xl1RR4hvIfhlibQuAXBlkDNJHguAivGe".to_string(),
       dest_folder: "1fS8tXRq0_0Fj_uFGIlPpTOQlLynIaBXt".to_string(),
-    });
+    })
   }
 
   pub fn organize(&self) -> Result {
@@ -124,14 +125,14 @@ impl DriveRomManager {
         }
       }
     }
-    return Ok(());
+    Ok(())
   }
 
   fn find_already_processed(&self) -> result::Result<(HashSet<Rom>, HashMap<String, String>), Box<error::Error>> {
     let mut found_roms: HashSet<Rom> = HashSet::new();
     let mut created_game_folders: HashMap<String, String> = HashMap::new();
     self.find_already_processed_rec(&self.dest_folder, None, &mut found_roms, &mut created_game_folders)?;
-    return Ok((found_roms, created_game_folders));
+    Ok((found_roms, created_game_folders))
   }
 
   fn find_already_processed_rec(
@@ -201,7 +202,7 @@ impl DriveRomManager {
       }
     }
 
-    return Ok(());
+    Ok(())
   }
 
   fn organize_rec(&self, id: &String,
@@ -279,7 +280,7 @@ impl DriveRomManager {
       }
     }
 
-    return Ok(());
+    Ok(())
   }
 }
 

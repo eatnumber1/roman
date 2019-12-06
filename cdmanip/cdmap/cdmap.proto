@@ -1,72 +1,142 @@
-// CompactDiscMap format based loosely off of
-// https://web.archive.org/web/20160201021136/http://digitalx.org/cue-sheet/syntax/#file
+// CompactDiscMap format based loosely off of the CUE sheet format.
+// https://www.gnu.org/software/ccd2cue/manual/html_node/CUE-sheet-format.html#CUE-sheet-format
 syntax = "proto3";
 
-package cdmanip.cdmap;
+package cdmanip;
 
-message File {
-  string name = 1;
-  string basedir = 6;
-
-  enum Type {
-    TYPE_UNKNOWN = 0;  // Unknown type. should never happen
-    // Intel binary file (least significant byte first)
-    TYPE_BINARY_BIG_ENDIAN = 1;
-    // Motorola binary file (most significant byte first)
-    TYPE_BINARY_LITTLE_ENDIAN = 2;
-    TYPE_AIFF = 3;  // Audio AIFF file
-    TYPE_WAVE = 4;  // Audio WAVE file
-    TYPE_MP3 = 5;  // Audio MP3 file
-  }
-  Type type = 2;
-
-  uint64 size = 3;
-  int64 blksize = 4;
-
-  string md5sum = 5;
-}
-
-message Track {
-  int32 num = 1;
-  File file = 2;
-  int64 sector_size = 3;
-
-  enum Type {
-    TYPE_UNKNOWN = 0;  // Unknown track type. Should never happen.
-    TYPE_AUDIO = 1;  // Audio/Music (2352)
-    TYPE_CDG = 2;  // Karaoke CD+G (2448)
-    TYPE_MODE1_2048 = 3;  // CDROM Mode1 Data (cooked)
-    TYPE_MODE1_2352 = 4;  // CDROM Mode1 Data (raw)
-    TYPE_MODE2_2336 = 5;  // CDROM-XA Mode2 Data
-    TYPE_MODE2_2352 = 6;  // CDROM-XA Mode2 Data
-    TYPE_CDI_2336 = 7;  // CDI Mode2 Data
-    TYPE_CDI_2352 = 8;  // CDI Mode2 Data
-  }
-  Type datatype = 4;
-
-  // Durations are relative to the beginning of ther containing file.
-  message Duration {
-    int32 minutes = 1;
-    int32 seconds = 2;
-    // Cue sheet documentation refers to these as "frames", even though that is
-    // incorrect. These are really "sectors". It is not to be confused with the
-    // actual frames that a sector is written into on a CD-ROM.
-    uint32 sectors = 3;
-  }
-  Duration pregap = 5;
-
-  message Index {
-    int32 num = 1;
-    Duration start_position = 2;
-    // The byte offset of the start of the data from the start of the file.
-    int64 offset = 3;
-    // The total length of the data.
-    uint64 length = 4;
-  }
-  repeated Index index = 6;
-}
+//message File {
+//  string name = 1;
+//  string basedir = 6;
+//
+//  enum Type {
+//    TYPE_UNKNOWN = 0;  // Unknown type. should never happen
+//    // Intel binary file (least significant byte first)
+//    TYPE_BINARY_BIG_ENDIAN = 1;
+//    // Motorola binary file (most significant byte first)
+//    TYPE_BINARY_LITTLE_ENDIAN = 2;
+//    TYPE_AIFF = 3;  // Audio AIFF file
+//    TYPE_WAVE = 4;  // Audio WAVE file
+//    TYPE_MP3 = 5;  // Audio MP3 file
+//  }
+//  Type type = 2;
+//
+//  uint64 size = 3;
+//  int64 blksize = 4;
+//
+//  string md5sum = 5;
+//}
 
 message CompactDiscMap {
-  string catalog = 1;
-  repeated Track track = 2;
+  enum Medium {
+    MEDIUM_UNKNOWN = 0;
+    MEDIUM_CD = 1;
+  }
+  Medium medium = 1;
+
+  message Language {
+    int32 code = 1;
+    string title = 2;  // Album name and Track titles
+    string performer = 3;  // Singer/player/conductor/orchestra
+    string songwriter = 4;  // Name of the songwriter
+    string composer = 5;  // Name of the composer
+    string arranger = 6;  // Name of the arranger
+    string message = 7;  // Message from content provider or artist
+    string disc_id = 8;  // Disc identification information
+    string genre = 9;  // Genre identification / information
+    string toc = 10;
+    string toc2 = 11;
+    string reserved_8a = 12;
+    string reserved_8b = 13;
+    string reserved_8c = 14;
+    string closed_info = 15;  // For internal use by content provider
+    string upc_isrc = 16;  // UPC/EAN code of album and ISRC for tracks
+    string size = 17;  // Size information of the block
+  }
+
+  message Track {
+    int32 number = 1;
+    string pregap_file = 9;
+    string file = 2;
+    int64 sector_size = 3;
+
+    enum Type {
+      TYPE_UNKNOWN = 0;  // Unknown track type. Should never happen.
+      TYPE_AUDIO = 1;  // Audio/Music (2352)
+      // TODO(eatnumber1): Unused
+      TYPE_CDG = 2;  // Karaoke CD+G (2448)
+      TYPE_MODE1_2048 = 3;  // CDROM Mode1 Data (cooked)
+      // TODO(eatnumber1): Unused
+      TYPE_MODE1_2352 = 4;  // CDROM Mode1 Data (raw)
+      TYPE_MODE2_2048 = 5;  // CDROM-XA Mode2 Data (form 1)
+      TYPE_MODE2_2324 = 6;  // CDROM-XA Mode2 Data (form 2)
+      TYPE_MODE2_2336 = 7;  // CDROM-XA Mode2 Data (form mixed)
+      TYPE_MODE2_2352 = 8;  // CDROM-XA Mode2 Data (raw)
+      // TODO(eatnumber1): Unused
+      TYPE_CDI_2336 = 9;  // CDI Mode2 Data
+      // TODO(eatnumber1): Unused
+      TYPE_CDI_2352 = 10;  // CDI Mode2 Data
+    }
+    Type type = 4;
+
+    // Durations are relative to the beginning of ther containing file.
+    //message Duration {
+    //  int32 minutes = 1;
+    //  int32 seconds = 2;
+    //  // Cue sheet documentation refers to these as "frames", even though that is
+    //  // incorrect. These are really "sectors". It is not to be confused with the
+    //  // actual frames that a sector is written into on a CD-ROM.
+    //  uint32 sectors = 3;
+    //}
+    //Duration pregap = 5;
+
+    message Index {
+      int32 number = 1;
+      // The byte offset of the start of the data from the start of the file.
+      int64 offset = 3;
+      // The total length of the data.
+      uint64 length = 4;
+    }
+    repeated Index index = 5;
+
+    enum Flag {
+      FLAG_UNKNOWN = 0;  // Unknown flag. Should never happen.
+      // TODO(eatnumber1): Maybe rename these flags to more readable variants.
+      //FLAG_DATA = 1;  // Data track
+      FLAG_DCP = 2;  // Digital copy permitted
+      FLAG_4CH = 3;  // Four channel audio
+      FLAG_PRE = 4;  // Pre-emphasis enabled (audio tracks only)
+      //FLAG_SCMS = 5;  // Serial copy management system
+    }
+    repeated Flag flag = 6;
+
+    repeated Language language = 7;
+
+    bytes isrc = 8;
+  }
+
+  message Session {
+    enum Type {
+      TYPE_UNKNOWN = 0;
+      TYPE_CDDA = 1;
+      TYPE_CDROM = 2;
+      TYPE_CDI = 3;
+      TYPE_CDROM_XA = 4;
+    }
+    Type type = 1;
+
+    // Media Catalog Number (MCN) is the standard UPC/EAN product number,
+    // and should conform to the specifications of the UCC and EAN. See
+    // http://www.ean-int.org and http://www.uc-council.org for more
+    // information.
+    //
+    // The MCN number must be 13 digits longs, but the UPC you were issued is
+    // 12 digits. The correct way to input the UPC code is to add a zero "0"
+    // to the beginning and it will show up correctly on the disc.
+    string mcn = 2;
+
+    repeated Track track = 3;
+
+    repeated Language language = 4;
+  }
+  repeated Session session = 2;
 }

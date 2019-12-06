@@ -123,6 +123,10 @@ bool ParseTrackType(string_view name, Track::Type *value) {
   return Track_Type_Parse(myname, value);
 }
 
+bool ParseFlag(string_view name, Track::Flag *value) {
+  return Track_Flag_Parse(StrCat("FLAG_", name), value);
+}
+
 string ParseCatalog(string_view line) {
   vector<string_view> tokens = StrSplit(line, ' ', SkipEmpty());
   assert(tokens.size() == 2);
@@ -149,7 +153,11 @@ Track ParseTrack(const File &file, string_view line) {
       sector_size = 2448;
       break;
     case Track::TYPE_MODE1_2048:
+    case Track::TYPE_MODE2_2048:
       sector_size = 2048;
+      break;
+    case Track::TYPE_MODE2_2324:
+      sector_size = 2324;
       break;
     case Track::TYPE_CDI_2336:
     case Track::TYPE_MODE2_2336:
@@ -196,6 +204,23 @@ Track::Duration ParsePregap(string_view line) {
   assert(tokens.at(0) == "PREGAP");
 
   return ParseDuration(tokens.at(1));
+}
+
+void ParseFlags(string_view line, Track *track) {
+  vector<string_view> tokens = StrSplit(line, ' ', SkipEmpty());
+  assert(tokens.size() == 2);
+  assert(tokens.at(0) == "FLAG");
+  tokens.erase(tokens.begin());
+
+  for (const auto &token : tokens) {
+    Track::Flag flag = Track::FLAG_UNKNOWN;
+    if (!ParseFlag(token, &flag)) {
+      std::cerr << "Could not parse \"" << token << "\" as a Track::Flag"
+                << std::endl;
+      exit(EX_DATAERR);
+    }
+    track->add_flag(flag);
+  }
 }
 
 Track::Index ParseIndex(const Track &track, string_view line) {
@@ -268,10 +293,10 @@ File ParseFile(string_view basedir, string_view line) {
   return file;
 }
 
-void PopulateLength(CompactDiscMap *cuesheet) {
+void PopulateLength(CompactDiscMap *cdmap) {
   Track::Index *previous_index = nullptr;
   const File *previous_file = nullptr;
-  for (Track &track : *cuesheet->mutable_track()) {
+  for (Track &track : *cdmap->mutable_track()) {
     if (previous_file && previous_file->name() != track.file().name()) {
       assert(previous_index);
       assert(previous_file->size() > previous_index->offset());
@@ -294,13 +319,37 @@ void PopulateLength(CompactDiscMap *cuesheet) {
   previous_index->set_length(previous_file->size() - previous_index->offset());
 }
 
+void SetImpliedFlags(CompactDiscMap *cdmap) {
+  for (Track &track : *cdmap->mutable_track()) {
+    switch (track.datatype()) {
+      case Track::TYPE_AUDIO:
+        break;
+      case Track::TYPE_MODE1_2048:
+      case Track::TYPE_MODE1_2352:
+      // TODO(eatnumber1): Check if the following track types have the data flag
+      // set.
+      case Track::TYPE_MODE2_2048:
+      case Track::TYPE_MODE2_2324:
+      case Track::TYPE_MODE2_2336:
+      case Track::TYPE_MODE2_2352:
+      case Track::TYPE_CDI_2336:
+      case Track::TYPE_CDI_2352:
+      case Track::TYPE_CDG:
+        track.add_flag(Track::FLAG_DATA);
+        break;
+      default:
+        assert(false);
+    }
+  }
+}
+
 }  // namespace
 
 CompactDiscMap ParseCuesheet(string_view path) {
   string basedir(path);
   basedir.erase(basedir.find_last_of('/'));
 
-  CompactDiscMap cuesheet;
+  CompactDiscMap cdmap;
 
   optional<File> current_file;
   optional<Track> current_track;
@@ -313,8 +362,10 @@ CompactDiscMap ParseCuesheet(string_view path) {
     trim(line);
     if (line.empty()) continue;
 
+    if (StartsWith(line, "REM ")) continue;
+
     if (StartsWith(line, "CATALOG ")) {
-      cuesheet.set_catalog(ParseCatalog(line));
+      cdmap.set_catalog(ParseCatalog(line));
       continue;
     }
 
@@ -326,7 +377,7 @@ CompactDiscMap ParseCuesheet(string_view path) {
 
     if (StartsWith(line, "TRACK ")) {
       if (current_track) {
-        *cuesheet.add_track() = std::move(*current_track);
+        *cdmap.add_track() = std::move(*current_track);
       }
       current_track = make_optional<Track>(ParseTrack(*current_file, line));
       continue;
@@ -348,12 +399,18 @@ CompactDiscMap ParseCuesheet(string_view path) {
       continue;
     }
 
+    if (StartsWith(line, "FLAG ")) {
+      ParseFlags(line, &current_track.value());
+      continue;
+    }
+
     std::cerr << "Could not parse line: \"" << line << "\"" << std::endl;
   }
 
-  PopulateLength(&cuesheet);
+  PopulateLength(&cdmap);
+  SetImpliedFlags(&cdmap);
 
-  return cuesheet;
+  return cdmap;
 }
 
 }  // namespace cdmanip

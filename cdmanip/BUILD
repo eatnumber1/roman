@@ -9,34 +9,34 @@ cc_binary(
     name = "cdmanip",
     srcs = ["cdmanip.cc"],
     deps = [
-        ":cuesheet",
-        ":hash",
+        #":cuesheet",
+        #":hash",
+        "//cdmanip/subcommands:all_subcommands",
         "//cdmanip/subcommands",
-        "@absl//absl/strings",
-        "@absl//absl/strings:str_format",
-        "@absl//absl/container:flat_hash_map",
+        "@rhutil//rhutil:status",
+        "@rhutil//rhutil:module_init",
+        "@abseil//absl/strings",
+        "@abseil//absl/types:span",
+        "@abseil//absl/flags:parse",
     ],
 )
 
-cc_library(
-    name = "hash",
-    srcs = ["hash.cc"],
-    hdrs = ["hash.h"],
-    deps = [
-        "@absl//absl/strings",
-        "@boringssl//:crypto",
-    ],
-)
+#cc_library(
+#    name = "cuesheet",
+#    srcs = ["cuesheet.cc"],
+#    hdrs = ["cuesheet.h"],
+#    deps = [
+#        "//cdmanip/cdmap:cdmap_cc_proto",
+#        "@absl//absl/strings",
+#        "@absl//absl/strings:str_format",
+#        "@absl//absl/types:optional",
+#        "@absl//absl/algorithm:container",
+#    ],
+#)
 
 cc_library(
-    name = "cuesheet",
-    srcs = ["cuesheet.cc"],
-    hdrs = ["cuesheet.h"],
-    deps = [
-        "//cdmanip/cdmap:cdmap_cc_proto",
-        "@absl//absl/strings",
-        "@absl//absl/strings:str_format",
-        "@absl//absl/types:optional",
-        "@absl//absl/algorithm:container",
-    ],
+    name = "common_flags",
+    srcs = ["common_flags.cc"],
+    hdrs = ["common_flags.h"],
+    deps = ["@abseil//absl/flags:flag"],
 )

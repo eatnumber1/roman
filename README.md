@@ -1,4 +1,4 @@
-# Roman: A ROM MANager
+# Roman: A toolkit for doing ROM mANagement
 
 Roman is a toolkit for doing ROM management. It is presented as a series of
 lightweight tools which allow for complete ROM management by composing them
@@ -12,11 +12,9 @@ verify 24 thousand files in 30 seconds.
 It is still undergoing active development, and is missing large pieces of
 functionality. Your mileage <s>may vary</s> will be short.
 
-[TOC]
-
 ## The DATPB File Format
 
-A datpb is a binary [protobuf] generated from a [dat file]. You can create one
+A [datpb] is a binary [protobuf] generated from a [dat file]. You can create one
 by either using [fetch] or [convert].
 
 ## Tools
@@ -67,8 +65,9 @@ $ rclone rcd --rc-user=user --rc-pass=pass &
 $ roman verify --rclone_url='http://user:pass@localhost:5572' --recursive pce.datpb 'gdrive:/Games/PC Engine'
 ```
 
-[dat file]: https://github.com/RetroPie/RetroPie-Setup/wiki/Validating,-Rebuilding,-and-Filtering-ROM-Collections#dat-files-the-cornerstone
-[protobuf]: https://developers.google.com/protocol-buffers
-[fetch]: #fetch
-[convert]: #convert
 [RClone]: https://rclone.org
+[convert]: #convert
+[dat file]: https://github.com/RetroPie/RetroPie-Setup/wiki/Validating,-Rebuilding,-and-Filtering-ROM-Collections#dat-files-the-cornerstone
+[datpb]: https://github.com/eatnumber1/dat2pb
+[fetch]: #fetch
+[protobuf]: https://developers.google.com/protocol-buffers

@@ -7,7 +7,7 @@ together.
 In addition, Roman supports cloud file systems by accessing all files through
 [RClone]. RClone is a mandatory dependency, but by leveraging it, ROMs stored in
 cloud file systems can be verified extremely quickly. On my machine, I can
-verify 24 thousand files in 30 seconds.
+verify 24 thousand files stored in Google Drive within 30 seconds.
 
 It is still undergoing active development, and is missing large pieces of
 functionality. Your mileage <s>may vary</s> will be short.

@@ -20,7 +20,7 @@ MD5_CTX *HasherMd5::GetContext(GError **error) {
   MD5_CTX ctx;
   if (MD5_Init(&ctx) != 1) {
     g_set_error(
-        error, CDMANIP_ERROR, roman::ERR_OPENSSL,
+        error, ROMAN_ERROR, roman::ERR_OPENSSL,
         "MD5_Init: %s",
         // TODO(eatnumber1): This is not thread safe. Make it so using
         // ERR_error_string_n
@@ -39,7 +39,7 @@ absl::optional<std::string> HasherMd5::Finalize(GError **error) {
   unsigned char digest[MD5_DIGEST_LENGTH];
   if (MD5_Final(digest, GetContext()) != 1) {
     g_set_error(
-        error, CDMANIP_ERROR, roman::ERR_OPENSSL,
+        error, ROMAN_ERROR, roman::ERR_OPENSSL,
         "MD5_Final: %s",
         // TODO(eatnumber1): This is not thread safe. Make it so using
         // ERR_error_string_n
@@ -61,7 +61,7 @@ bool HasherMd5::Update(absl::string_view data, GError **error) {
 
   if (MD5_Update(ctx, data.data(), data.size()) != 1) {
     g_set_error(
-        error, CDMANIP_ERROR, roman::ERR_OPENSSL,
+        error, ROMAN_ERROR, roman::ERR_OPENSSL,
         "MD5_Update: %s",
         // TODO(eatnumber1): This is not thread safe. Make it so using
         // ERR_error_string_n

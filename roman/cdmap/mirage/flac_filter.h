@@ -1,5 +1,5 @@
-#ifndef CDMANIP_CDMAP_MIRAGE_FLAC_FILTER_H_
-#define CDMANIP_CDMAP_MIRAGE_FLAC_FILTER_H_
+#ifndef ROMAN_CDMAP_MIRAGE_FLAC_FILTER_H_
+#define ROMAN_CDMAP_MIRAGE_FLAC_FILTER_H_
 
 #include <gmodule.h>
 #include <glib-object.h>
@@ -41,4 +41,4 @@ GType mirage_filter_stream_flacfile_get_type();
 
 G_END_DECLS
 
-#endif  // CDMANIP_CDMAP_MIRAGE_FLAC_FILTER_H_
+#endif  // ROMAN_CDMAP_MIRAGE_FLAC_FILTER_H_

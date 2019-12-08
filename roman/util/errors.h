@@ -1,5 +1,5 @@
-#ifndef CDMANIP_UTIL_ERRORS_H_
-#define CDMANIP_UTIL_ERRORS_H_
+#ifndef ROMAN_UTIL_ERRORS_H_
+#define ROMAN_UTIL_ERRORS_H_
 
 #include <sysexits.h>
 
@@ -12,7 +12,7 @@
     } \
   } while(false)
 
-#define CDMANIP_ERROR ::roman::ErrorQuark()
+#define ROMAN_ERROR ::roman::ErrorQuark()
 
 namespace roman {
 
@@ -29,4 +29,4 @@ enum Error : int {
 
 }  // namespace roman
 
-#endif  // CDMANIP_UTIL_ERRORS_H_
+#endif  // ROMAN_UTIL_ERRORS_H_

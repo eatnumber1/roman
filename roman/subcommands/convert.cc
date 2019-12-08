@@ -65,7 +65,7 @@ GObjectPtr<MirageContext> CreateContext(GError **error) {
     log_domains.emplace(G_LOG_DOMAIN);
     std::string new_log_domains_str = absl::StrJoin(log_domains, " ");
     if (setenv(kDebugEnvVar, new_log_domains_str.c_str(), true) != 0) {
-      g_set_error(error, CDMANIP_ERROR, roman::ERR_OS,
+      g_set_error(error, ROMAN_ERROR, roman::ERR_OS,
           "Failed to set environment variable %s: %s", kDebugEnvVar,
           std::strerror(errno));
       return nullptr;
@@ -101,7 +101,7 @@ bool SubCommand::Convert(
     GError **error) {
   if (args.size() != 4) {
     g_set_error(
-        error, CDMANIP_ERROR, roman::ERR_USAGE,
+        error, ROMAN_ERROR, roman::ERR_USAGE,
         "Usage: %s %s source dest_writer dest", getprogname(), args[0].data());
     return false;
   }

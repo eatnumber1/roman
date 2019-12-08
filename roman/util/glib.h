@@ -1,5 +1,5 @@
-#ifndef CDMANIP_UTIL_GLIB_H_
-#define CDMANIP_UTIL_GLIB_H_
+#ifndef ROMAN_UTIL_GLIB_H_
+#define ROMAN_UTIL_GLIB_H_
 
 #include <memory.h>
 
@@ -85,4 +85,4 @@ GObjectPtr<T> WrapGObject(T *obj) {
 
 }  // namespace roman
 
-#endif  // CDMANIP_UTIL_GLIB_H_
+#endif  // ROMAN_UTIL_GLIB_H_

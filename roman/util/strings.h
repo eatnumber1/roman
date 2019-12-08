@@ -1,5 +1,5 @@
-#ifndef CDMANIP_UTIL_STRINGS_H_
-#define CDMANIP_UTIL_STRINGS_H_
+#ifndef ROMAN_UTIL_STRINGS_H_
+#define ROMAN_UTIL_STRINGS_H_
 
 #include <cstdint>
 
@@ -16,4 +16,4 @@ absl::Span<T> SpanFromNullTerm(T *ary) {
 
 }  // namespace roman
 
-#endif  // CDMANIP_UTIL_STRINGS_H_
+#endif  // ROMAN_UTIL_STRINGS_H_

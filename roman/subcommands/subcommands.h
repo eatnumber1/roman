@@ -1,5 +1,5 @@
-#ifndef CDMANIP_SUBCOMMANDS_SUBCOMMANDS_H_
-#define CDMANIP_SUBCOMMANDS_SUBCOMMANDS_H_
+#ifndef ROMAN_SUBCOMMANDS_SUBCOMMANDS_H_
+#define ROMAN_SUBCOMMANDS_SUBCOMMANDS_H_
 
 #include <string_view>
 #include <string>
@@ -32,4 +32,4 @@ class SubCommands {
 
 }  // namespace roman
 
-#endif  // CDMANIP_SUBCOMMANDS_SUBCOMMANDS_H_
+#endif  // ROMAN_SUBCOMMANDS_SUBCOMMANDS_H_

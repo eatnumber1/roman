@@ -1,5 +1,5 @@
-#ifndef CDMANIP_FS_FS_H_
-#define CDMANIP_FS_FS_H_
+#ifndef ROMAN_FS_FS_H_
+#define ROMAN_FS_FS_H_
 
 #include <string>
 #include <cstddef>
@@ -47,4 +47,4 @@ rhutil::Status StatRecursive(
 
 }  // namespace roman
 
-#endif  // CDMANIP_FS_FS_H_
+#endif  // ROMAN_FS_FS_H_

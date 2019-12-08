@@ -61,7 +61,7 @@ class Encoder : public FLAC::Encoder::Stream {
       last_error_ = nullptr;
     } else {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_FLAC,
+          error, ROMAN_ERROR, roman::ERR_FLAC,
           "%s: %s", absl::StrFormat(fmt, args...).c_str(),
           FLAC__StreamEncoderStateString[state]);
     }
@@ -130,7 +130,7 @@ struct MirageFilterStreamFlacfilePrivate {
   bool Open(MirageStream *stream, bool writable, GError **error) {
     if (!writable) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_UNIMPL,
+          error, ROMAN_ERROR, roman::ERR_UNIMPL,
           "MirageFilterStreamFlacfile is write-only");
       return false;
     }
@@ -153,7 +153,7 @@ struct MirageFilterStreamFlacfilePrivate {
     FLAC__StreamEncoderInitStatus status = encoder_->init();
     if (status != FLAC__STREAM_ENCODER_INIT_STATUS_OK) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_FLAC,
+          error, ROMAN_ERROR, roman::ERR_FLAC,
           "Error initializing FLAC library: %s",
           FLAC__StreamEncoderInitStatusString[status]);
       return false;
@@ -165,7 +165,7 @@ struct MirageFilterStreamFlacfilePrivate {
   ssize_t Read(absl::Span<int16_t> buffer, GError **error) {
     g_assert(encoder_);
     g_set_error(
-        error, CDMANIP_ERROR, roman::ERR_UNIMPL,
+        error, ROMAN_ERROR, roman::ERR_UNIMPL,
         "Reading from MirageFilterStreamFlacfile unsupported.");
     return 0;
   }
@@ -197,7 +197,7 @@ struct MirageFilterStreamFlacfilePrivate {
     g_assert(encoder_);
     if (current_position_ == offset) return true;
     g_set_error(
-        error, CDMANIP_ERROR, roman::ERR_UNIMPL,
+        error, ROMAN_ERROR, roman::ERR_UNIMPL,
         "Seeking to %llx within MirageFilterStreamFlacfile unsupported.",
         offset);
     return false;

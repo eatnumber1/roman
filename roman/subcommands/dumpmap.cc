@@ -33,7 +33,7 @@ bool SubCommand::DumpMap(
     GError **error) {
   if (args.size() != 2) {
     g_set_error(
-        error, CDMANIP_ERROR, roman::ERR_USAGE,
+        error, ROMAN_ERROR, roman::ERR_USAGE,
         "Usage: %s %s map.cdm", getprogname(), args[0].data());
     return false;
   }

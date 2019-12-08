@@ -44,7 +44,7 @@ std::vector<absl::string_view> ToStringViews(char **strings) {
 GObjectPtr<MirageContext> CreateContext(GError **error) {
   auto ctx = NewGObject<MirageContext>(MIRAGE_TYPE_CONTEXT, nullptr);
 
-  mirage_context_set_debug_domain(ctx.get(), "CDMANIP");
+  mirage_context_set_debug_domain(ctx.get(), "ROMAN");
   mirage_context_set_debug_name(ctx.get(), "roman");
 
   GError *err = nullptr;
@@ -172,7 +172,7 @@ bool SubCommand::Import(
     GError **error) {
   if (args.size() < 1) {
     g_set_error(
-        error, CDMANIP_ERROR, roman::ERR_USAGE,
+        error, ROMAN_ERROR, roman::ERR_USAGE,
         "Usage: %s %s source", getprogname(), args[0].data());
     return false;
   }

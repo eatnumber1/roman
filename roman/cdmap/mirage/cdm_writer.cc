@@ -68,7 +68,7 @@ struct MirageWriterCdmPrivate {
         SpanFromNullTerm(mirage_disc_get_filenames(disc));
     if (filenames.size() != 1) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_USAGE,
+          error, ROMAN_ERROR, roman::ERR_USAGE,
           "Invalid number of filenames provided. Expected 1, got %d.",
           static_cast<int>(filenames.size()));
       return false;
@@ -118,7 +118,7 @@ struct MirageWriterCdmPrivate {
         break;
       default:
         g_set_error(
-            error, CDMANIP_ERROR, roman::ERR_UNIMPL,
+            error, ROMAN_ERROR, roman::ERR_UNIMPL,
             "Sector type %d not supported.", sector_type);
         return nullptr;
     }
@@ -166,7 +166,7 @@ struct MirageWriterCdmPrivate {
     std::string map_buf;
     if (!map.SerializeToString(&map_buf)) {
         g_set_error(
-            error, CDMANIP_ERROR, roman::ERR_UNKNOWN,
+            error, ROMAN_ERROR, roman::ERR_UNKNOWN,
             "Unknown error serializing CompactDiscMap:\n%s\n",
             map.DebugString().c_str());
         return false;
@@ -174,7 +174,7 @@ struct MirageWriterCdmPrivate {
 
     if (mirage_stream_write(stream.Get(), map_buf.c_str(), map_buf.size(), error) != map_buf.size()) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_UNKNOWN,
+          error, ROMAN_ERROR, roman::ERR_UNKNOWN,
           "Unknown error writing CompactDiscMap to stream.");
       return false;
     }
@@ -248,7 +248,7 @@ struct MirageWriterCdmPrivate {
     FLAC__StreamMetadata *metadata = FLAC__metadata_object_new(FLAC__METADATA_TYPE_CUESHEET);
     if (!metadata) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_FLAC,
+          error, ROMAN_ERROR, roman::ERR_FLAC,
           "Failed to create FLAC__StreamMetadata");
       return false;
     }
@@ -259,7 +259,7 @@ struct MirageWriterCdmPrivate {
     FLAC::Metadata::CueSheet::Track cuetrack;
     if (!cuetrack.is_valid()) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_FLAC,
+          error, ROMAN_ERROR, roman::ERR_FLAC,
           "Failed to create FLAC::Metadata::CueSheet::Track");
       return false;
     }
@@ -293,7 +293,7 @@ struct MirageWriterCdmPrivate {
 
     if (!cuesheet.insert_track(/*track_num=*/0, cuetrack)) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_FLAC,
+          error, ROMAN_ERROR, roman::ERR_FLAC,
           "Failed to set track in cuesheet");
       return false;
     }
@@ -301,7 +301,7 @@ struct MirageWriterCdmPrivate {
     const char *explanation = nullptr;
     if (!cuesheet.is_legal(/*check_cd_da_subset=*/false, &explanation)) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_FLAC,
+          error, ROMAN_ERROR, roman::ERR_FLAC,
           "Generated cuesheet is illegal: %s", explanation);
       return false;
     }
@@ -309,7 +309,7 @@ struct MirageWriterCdmPrivate {
     FLAC::Metadata::SimpleIterator iter;
     if (!iter.is_valid()) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_FLAC,
+          error, ROMAN_ERROR, roman::ERR_FLAC,
           "Failed to create FLAC::Metadata::SimpleIterator");
       return false;
     }
@@ -317,7 +317,7 @@ struct MirageWriterCdmPrivate {
     if (!iter.init(data_file.data(), /*read_only=*/false,
                    /*preserve_file_stats=*/false)) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_FLAC,
+          error, ROMAN_ERROR, roman::ERR_FLAC,
           "Failed to initialize FLAC metadata writer: %s",
           iter.status().as_cstring());
       return false;
@@ -325,7 +325,7 @@ struct MirageWriterCdmPrivate {
 
     if (!iter.insert_block_after(&cuesheet, /*use_padding=*/true)) {
       g_set_error(
-          error, CDMANIP_ERROR, roman::ERR_FLAC,
+          error, ROMAN_ERROR, roman::ERR_FLAC,
           "Failed to insert FLAC metadata block: %s",
           FLAC__Metadata_SimpleIteratorStatusString[iter.status()]);
       return false;
@@ -521,7 +521,7 @@ struct MirageWriterCdmPrivate {
     int num_fragments = mirage_track_get_number_of_fragments(mirage_track);
     if (num_fragments != 2) {
         g_set_error(
-            error, CDMANIP_ERROR, roman::ERR_UNIMPL,
+            error, ROMAN_ERROR, roman::ERR_UNIMPL,
             "Found %d fragments in track %d, which is unsupported.",
             num_fragments, mirage_track_layout_get_track_number(mirage_track));
         return {};
@@ -567,7 +567,7 @@ struct MirageWriterCdmPrivate {
         break;
       default:
         g_set_error(
-            error, CDMANIP_ERROR, roman::ERR_UNIMPL,
+            error, ROMAN_ERROR, roman::ERR_UNIMPL,
             "Track type %d not supported.", sector_type);
         return false;
     }
@@ -660,7 +660,7 @@ struct MirageWriterCdmPrivate {
         break;
       default:
         g_set_error(
-            error, CDMANIP_ERROR, roman::ERR_UNIMPL,
+            error, ROMAN_ERROR, roman::ERR_UNIMPL,
             "Session type %d not supported.", session_type);
         return false;
     }
@@ -690,7 +690,7 @@ struct MirageWriterCdmPrivate {
         break;
       default:
         g_set_error(
-            error, CDMANIP_ERROR, roman::ERR_UNIMPL,
+            error, ROMAN_ERROR, roman::ERR_UNIMPL,
             "Disc type %d not supported.", medium);
         return false;
     }

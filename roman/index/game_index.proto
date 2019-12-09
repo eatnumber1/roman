@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package roman;
+
+import "dat2pb/romdat.proto";
+
+message GameIndex {
+  message Game {
+    message Rom {
+      dat2pb.RomDat.Game.Rom dat = 1;
+      string path = 2;
+    }
+
+    dat2pb.RomDat.Game dat = 1;
+    repeated Rom rom = 2;
+  }
+  repeated Game game = 1;
+}

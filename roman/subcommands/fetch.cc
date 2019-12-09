@@ -8,18 +8,14 @@
 #include "absl/strings/str_format.h"
 #include "absl/types/span.h"
 #include "roman/subcommands/subcommands.h"
+#include "roman/print_proto.h"
 #include "dat2pb/parser.h"
 #include "dat2pb/romdat.pb.h"
-#include "google/protobuf/io/zero_copy_stream_impl.h"
-#include "google/protobuf/text_format.h"
 #include "rhutil/curl/curl.h"
 #include "rhutil/module_init.h"
 #include "rhutil/status.h"
 #include "zip.h"
 #include "roman/common_flags.h"
-
-ABSL_FLAG(bool, binary, false,
-          "Output using the binary format instead of text");
 
 namespace roman {
 namespace {
@@ -38,8 +34,6 @@ using ::rhutil::CurlEasySetWriteCallback;
 using ::rhutil::InvalidArgumentError;
 using ::rhutil::InvalidArgumentErrorBuilder;
 using ::rhutil::UnknownError;
-using ::google::protobuf::io::OstreamOutputStream;
-using ::google::protobuf::TextFormat;
 
 class ZipDiscard {
  public:
@@ -207,17 +201,7 @@ Status SubCommandFetch(absl::Span<std::string_view> args) {
   RETURN_IF_ERROR(rhutil::CurlGlobalInit());
 
   ASSIGN_OR_RETURN(RomDat dat, RedumpFetcher().GetRomDat(console));
-
-  if (absl::GetFlag(FLAGS_binary)) {
-    if (!dat.SerializeToOstream(&std::cout)) {
-      return UnknownError("Failed to write romdat to stdout");
-    }
-  } else {
-    OstreamOutputStream strm(&std::cout);
-    if (!TextFormat::Print(dat, &strm)) {
-      return UnknownError("Failed to write romdat textproto to stdout");
-    }
-  }
+  RETURN_IF_ERROR(PrintProto(dat, &std::cout));
 
   return OkStatus();
 }

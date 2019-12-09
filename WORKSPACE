@@ -48,30 +48,12 @@ git_repository(
 #    build_file = "all_content.BUILD",
 #)
 
-#new_local_repository(
-#    name = "libmirage",
-#    path = "/opt/libmirage",
-#    build_file = "third_party/libmirage.BUILD",
-#)
-#
-#new_local_repository(
-#    name = "flac",
-#    path = "/opt/homebrew/opt/flac",
-#    build_file = "third_party/libflac.BUILD",
-#)
-
 git_repository(
     name = "googletest",
     remote = "https://github.com/google/googletest.git",
     commit = "90a443f9c2437ca8a682a1ac625eba64e1d74a8a",
     shallow_since = "1565193450 -0400",
     repo_mapping = {"@com_google_absl": "@abseil"},
-)
-
-new_local_repository(
-    name = "glib",
-    path = "/opt/homebrew/opt/glib",
-    build_file = "third_party/glib.BUILD",
 )
 
 http_archive(
@@ -105,8 +87,8 @@ new_git_repository(
 git_repository(
     name = "rhutil",
     remote = "https://github.com/eatnumber1/rhutil.git",
-    commit = "2be4adf6679dc48eb58ca97b7f141bb077e69c5e",
-    shallow_since = "1575606422 -0800",
+    commit = "f097f8f118e24434c4fdaaf64ec18e084543b1d5",
+    shallow_since = "1575881701 -0800",
 )
 
 git_repository(

@@ -40,3 +40,20 @@ cc_library(
     hdrs = ["common_flags.h"],
     deps = ["@abseil//absl/flags:flag"],
 )
+
+cc_library(
+    name = "hash",
+    srcs = ["hash.cc"],
+    hdrs = ["hash.h"],
+)
+
+cc_library(
+    name = "print_proto",
+    srcs = ["print_proto.cc"],
+    hdrs = ["print_proto.h"],
+    deps = [
+        "@rhutil//rhutil:status",
+        "@abseil//absl/flags:flag",
+        "@com_google_protobuf//:protobuf",
+    ],
+)
